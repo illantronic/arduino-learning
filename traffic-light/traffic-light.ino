@@ -1,189 +1,191 @@
-//DECLARACION DE VARIABLES
-int rojo = 6;
-int amarillo = 5;
-int verde = 4;
-int modo = 0;
+// VARIABLE DECLARATION
+int red = 6;
+int yellow = 5;
+int green = 4;
+int mode = 0;
 
 
-
-//VARIABLES MODO NORMAL
-int faseNormal = 0;
-unsigned long tiempoNormal = 0;
-
+// NORMAL MODE VARIABLES
+int normalPhase = 0;
+unsigned long normalTime = 0;
 
 
-//VARIABLES MODO INTERMITENTE
-bool estadoIntermitente = false;
-unsigned long tiempoIntermitente = 0;
+// BLINKING MODE VARIABLES
+bool blinkingState = false;
+unsigned long blinkingTime = 0;
 
 
-//FUNCION PARPADEAR LED SIN DELAY(PIN, MODO Y ESTADO, TIEMPO ANTERIOR)
-void parpadear(int pin, bool &estado, unsigned long &tiempoAnterior) {
+// FUNCTION TO BLINK AN LED WITHOUT DELAY (PIN, STATE, PREVIOUS TIME)
+void blink(int pin, bool &state, unsigned long &previousTime) {
 
-  //SI MIDE UN TIEMPO QUE ES MENOR A 500, NO CAMBIA ESTADO, SINO CAMBIA Y SE ACTUALIZA A EL VALOR ACTUAL
-  //NO SE RESETEA A 0 PORQUE MILLIS NUNCA DEJA DE AVANZAR
-  if (millis() - tiempoAnterior >= 500) {
+  // IF LESS THAN 500 MS HAVE PASSED, DO NOT CHANGE THE STATE.
+  // OTHERWISE, CHANGE THE STATE AND UPDATE THE PREVIOUS TIME.
+  // IT IS NOT RESET TO 0 BECAUSE MILLIS() KEEPS INCREASING.
+  if (millis() - previousTime >= 500) {
 
-    estado = !estado;
+    state = !state;
 
-    digitalWrite(pin, estado);
+    digitalWrite(pin, state);
 
-    tiempoAnterior = millis();
+    previousTime = millis();
   }
 }
 
 
-//FUNCION PARA MOSTRAR MENU PRINCIPAL
-void mostrarMenu() {
+// FUNCTION TO DISPLAY THE MAIN MENU
+void showMenu() {
 
   Serial.println("--------------------");
-  Serial.println("Selecciona nuevo modo:");
-  Serial.println("0 - Salir, Apagado");
+  Serial.println("Select a new mode:");
+  Serial.println("0 - Exit, Off");
   Serial.println("1 - Normal");
-  Serial.println("2 - Amarillo intermitente");
-  Serial.println("3 - Manual simple");
-  Serial.println("4 - Manual complejo");
+  Serial.println("2 - Blinking yellow");
+  Serial.println("3 - Simple manual");
+  Serial.println("4 - Advanced manual");
 }
 
 
-//FUNCION PARA MOSTRAR MENU MANUAL SIMPLE
-void mostrarMenuManualSimple() {
+// FUNCTION TO DISPLAY THE SIMPLE MANUAL MENU
+void showSimpleManualMenu() {
 
   Serial.println("--------------------");
-  Serial.println("MODO MANUAL SIMPLE");
-  Serial.println("Selecciona una luz:");
-  Serial.println("1 - Rojo");
-  Serial.println("2 - Amarillo");
-  Serial.println("3 - Verde");
-  Serial.println("0 - Salir, Apagado");
+  Serial.println("SIMPLE MANUAL MODE");
+  Serial.println("Select a light:");
+  Serial.println("1 - Red");
+  Serial.println("2 - Yellow");
+  Serial.println("3 - Green");
+  Serial.println("0 - Exit, Off");
   Serial.println("--------------------");
 }
 
 
-//FUNCION PARA MOSTRAR MENU MANUAL COMPLEJO
-void mostrarMenuManualComplejo() {
+// FUNCTION TO DISPLAY THE ADVANCED MANUAL MENU
+void showAdvancedManualMenu() {
 
   Serial.println("--------------------");
-  Serial.println("MODO MANUAL COMPLEJO");
-  Serial.println("Selecciona una opcion:");
-  Serial.println("1 - Rojo fijo");
-  Serial.println("2 - Amarillo fijo");
-  Serial.println("3 - Verde fijo");
-  Serial.println("4 - Parpadeo rojo");
-  Serial.println("5 - Parpadeo amarillo");
-  Serial.println("6 - Parpadeo verde");
-  Serial.println("0 - Salir, Apagado");
+  Serial.println("ADVANCED MANUAL MODE");
+  Serial.println("Select an option:");
+  Serial.println("1 - Solid red");
+  Serial.println("2 - Solid yellow");
+  Serial.println("3 - Solid green");
+  Serial.println("4 - Blinking red");
+  Serial.println("5 - Blinking yellow");
+  Serial.println("6 - Blinking green");
+  Serial.println("0 - Exit, Off");
   Serial.println("--------------------");
   Serial.println("EXTRA:");
-  Serial.println("Pulsa otra vez el mismo modo para apagar.");
-  Serial.println("Otro modo del mismo LED sustituye al anterior.");
+  Serial.println("Select the same mode again to turn it off.");
+  Serial.println("Another mode for the same LED replaces the previous one.");
   Serial.println("--------------------");
 }
 
 
 void setup() {
 
-  //PONER LOS PINES EN MODO OUTPUT
-  pinMode(rojo, OUTPUT);
-  pinMode(amarillo, OUTPUT);
-  pinMode(verde, OUTPUT);
+  // SET PINS AS OUTPUT
+  pinMode(red, OUTPUT);
+  pinMode(yellow, OUTPUT);
+  pinMode(green, OUTPUT);
 
-  //COMENZAR COMUNICACION CON EL ORDENADOR
+  // START SERIAL COMMUNICATION WITH THE COMPUTER
   Serial.begin(9600);
 
-  //MIENTRAS MODO SIGA EN 0(MODO POR DEFECTO)
-  while (modo == 0) {
+  // WHILE MODE REMAINS 0 (DEFAULT MODE)
+  while (mode == 0) {
 
     Serial.println(" ");
-    Serial.println("Selecciona el modo:");
-    Serial.println("0 - Apagado");
+    Serial.println("Select a mode:");
+    Serial.println("0 - Off");
     Serial.println("1 - Normal");
-    Serial.println("2 - Amarillo intermitente");
-    Serial.println("3 - Manual simple");
-    Serial.println("4 - Manual complejo");
+    Serial.println("2 - Blinking yellow");
+    Serial.println("3 - Simple manual");
+    Serial.println("4 - Advanced manual");
 
 
-    //MIENTRAS NO RECIBA NINGUN CARACTER, PERMANECER APAGADO
+    // WHILE NO CHARACTER IS RECEIVED, KEEP ALL LEDS OFF
     while (Serial.available() == 0) {
 
-      digitalWrite(rojo, LOW);
-      digitalWrite(amarillo, LOW);
-      digitalWrite(verde, LOW);
+      digitalWrite(red, LOW);
+      digitalWrite(yellow, LOW);
+      digitalWrite(green, LOW);
     }
 
-    //CUANDO RECIBA UN CARACTER, SALE DEL WHILE, Y LO LEE
-    char entrada = Serial.read();
+    // WHEN A CHARACTER IS RECEIVED, EXIT THE WHILE LOOP AND READ IT
+    char input = Serial.read();
 
 
-    //COMPROBAR VALOR INVALIDO CON CODIGO ASCII(MAS EFICIENTE PARA CASOS DE INTRODUCIR LETRAS)
-    if (entrada < '0' || entrada > '4') {
+    // CHECK FOR AN INVALID VALUE USING ASCII
+    // THIS ALSO ALLOWS INVALID CHARACTERS SUCH AS LETTERS TO BE DETECTED
+    if (input < '0' || input > '4') {
 
       Serial.println("--------------------");
-      Serial.println("Valor invalido.");
+      Serial.println("Invalid value.");
       Serial.println("--------------------");
 
-      modo = 0;
+      mode = 0;
     }
-    //SI ES VALIDO, MODO ES LO QUE LEYO DEL SERIAL MONITOR
+
+    // IF VALID, MODE BECOMES THE VALUE READ FROM THE SERIAL MONITOR
     else {
 
-      //COMO USAMOS CODIGO ASCII, PARA TRANSFORMAR EN EL NUMERO QUE QUEREMOS X - 48 (EL 0 EN ASCII VALE 48)
-      modo = entrada - '0';
+      // SINCE WE ARE USING ASCII, SUBTRACT '0'
+      // TO CONVERT THE CHARACTER INTO ITS NUMERIC VALUE
+      mode = input - '0';
 
 
-      if (modo == 0) {
+      if (mode == 0) {
 
         Serial.println("--------------------");
-        Serial.println("Modo seleccionado: 0 - Apagado");
+        Serial.println("Selected mode: 0 - Off");
         Serial.println("--------------------");
       }
 
 
-      else if (modo == 1) {
+      else if (mode == 1) {
 
         Serial.println("--------------------");
-        Serial.println("Modo seleccionado: 1 - Normal");
+        Serial.println("Selected mode: 1 - Normal");
 
-        //COMENZAR CICLO NORMAL EN EL COLOR ROJO
-        faseNormal = 0;
-        tiempoNormal = millis();
+        // START THE NORMAL CYCLE WITH THE RED LIGHT
+        normalPhase = 0;
+        normalTime = millis();
 
-        digitalWrite(rojo, HIGH);
-        digitalWrite(amarillo, LOW);
-        digitalWrite(verde, LOW);
+        digitalWrite(red, HIGH);
+        digitalWrite(yellow, LOW);
+        digitalWrite(green, LOW);
 
-        mostrarMenu();
+        showMenu();
       }
 
 
-      else if (modo == 2) {
+      else if (mode == 2) {
 
         Serial.println("--------------------");
-        Serial.println("Modo seleccionado: 2 - Amarillo intermitente");
+        Serial.println("Selected mode: 2 - Blinking yellow");
 
-        //MIRA EL MODO Y EL TIEMPO ACTUAL
-        estadoIntermitente = false;
-        tiempoIntermitente = millis();
+        // STORE THE INITIAL STATE AND CURRENT TIME
+        blinkingState = false;
+        blinkingTime = millis();
 
-        digitalWrite(rojo, LOW);
-        digitalWrite(amarillo, LOW);
-        digitalWrite(verde, LOW);
+        digitalWrite(red, LOW);
+        digitalWrite(yellow, LOW);
+        digitalWrite(green, LOW);
 
-        mostrarMenu();
+        showMenu();
       }
 
 
-      else if (modo == 3) {
+      else if (mode == 3) {
 
         Serial.println("--------------------");
-        Serial.println("Modo seleccionado: 3 - Manual simple");
+        Serial.println("Selected mode: 3 - Simple manual");
       }
 
 
-      else if (modo == 4) {
+      else if (mode == 4) {
 
         Serial.println("--------------------");
-        Serial.println("Modo seleccionado: 4 - Manual complejo");
+        Serial.println("Selected mode: 4 - Advanced manual");
       }
     }
   }
@@ -194,439 +196,455 @@ void setup() {
 void loop() {
 
 
-  //COMPROBAR SI HE ENVIADO UN NUEVO CODIGO POR EL SERIAL
+  // CHECK IF A NEW VALUE HAS BEEN SENT THROUGH SERIAL
   if (Serial.available() > 0) {
 
-    char entrada = Serial.read();
+    char input = Serial.read();
 
 
-    //COMPROBAR SI ES INVALIDA
-    if (entrada < '0' || entrada > '4') {
+    // CHECK IF THE VALUE IS INVALID
+    if (input < '0' || input > '4') {
 
       Serial.println("--------------------");
-      Serial.println("Valor invalido.");
+      Serial.println("Invalid value.");
       Serial.println("--------------------");
 
-      modo = 0;
+      mode = 0;
     }
 
     else {
 
-      modo = entrada - '0';
+      mode = input - '0';
 
 
-      if (modo == 0) {
+      if (mode == 0) {
 
         Serial.println("--------------------");
-        Serial.println("Modo seleccionado: 0 - Apagado");
+        Serial.println("Selected mode: 0 - Off");
 
-        mostrarMenu();
+        showMenu();
       }
 
 
-      else if (modo == 1) {
+      else if (mode == 1) {
 
         Serial.println("--------------------");
-        Serial.println("Modo seleccionado: 1 - Normal");
+        Serial.println("Selected mode: 1 - Normal");
 
-        //REINICIAR SEMAFORO DESDE ROJO
-        faseNormal = 0;
-        tiempoNormal = millis();
+        // RESTART THE TRAFFIC LIGHT FROM RED
+        normalPhase = 0;
+        normalTime = millis();
 
-        digitalWrite(rojo, HIGH);
-        digitalWrite(amarillo, LOW);
-        digitalWrite(verde, LOW);
+        digitalWrite(red, HIGH);
+        digitalWrite(yellow, LOW);
+        digitalWrite(green, LOW);
 
-        mostrarMenu();
+        showMenu();
       }
 
 
-      else if (modo == 2) {
+      else if (mode == 2) {
 
         Serial.println("--------------------");
-        Serial.println("Modo seleccionado: 2 - Amarillo intermitente");
+        Serial.println("Selected mode: 2 - Blinking yellow");
 
-        //MIRAR MODO Y TIEMPO ACTUAL
-        estadoIntermitente = false;
-        tiempoIntermitente = millis();
+        // STORE THE INITIAL STATE AND CURRENT TIME
+        blinkingState = false;
+        blinkingTime = millis();
 
-        digitalWrite(rojo, LOW);
-        digitalWrite(amarillo, LOW);
-        digitalWrite(verde, LOW);
+        digitalWrite(red, LOW);
+        digitalWrite(yellow, LOW);
+        digitalWrite(green, LOW);
 
-        mostrarMenu();
+        showMenu();
       }
 
 
-      else if (modo == 3) {
+      else if (mode == 3) {
 
         Serial.println("--------------------");
-        Serial.println("Modo seleccionado: 3 - Manual simple");
+        Serial.println("Selected mode: 3 - Simple manual");
       }
 
 
-      else if (modo == 4) {
+      else if (mode == 4) {
 
         Serial.println("--------------------");
-        Serial.println("Modo seleccionado: 4 - Manual complejo");
+        Serial.println("Selected mode: 4 - Advanced manual");
       }
     }
   }
 
 
 
+  // MODE 0: OFF
 
-  // MODO 0: APAGADO
+  if (mode == 0) {
 
-  if (modo == 0) {
-
-    digitalWrite(rojo, LOW);
-    digitalWrite(amarillo, LOW);
-    digitalWrite(verde, LOW);
-  }
-
-  // MODO 1: NORMAL SIN DELAY
-
-  else if (modo == 1) {
-
-
-    // FASE 0: ROJO
-    if (faseNormal == 0) {
-
-      //PARA QUE SOLO CAMBIE DE COLOR UNA VEZ PASEN 3000MS DESDE EL MOMENTO ACTUAL MEDIDO ANTERIORMENTE
-      if (millis() - tiempoNormal >= 3000) {
-
-        digitalWrite(rojo, LOW);
-        digitalWrite(verde, HIGH);
-
-        faseNormal = 1;
-        tiempoNormal = millis();
-      }
-    }
-
-
-    // FASE 1: VERDE
-    else if (faseNormal == 1) {
-
-      if (millis() - tiempoNormal >= 3000) {
-
-        digitalWrite(verde, LOW);
-        digitalWrite(amarillo, HIGH);
-
-        faseNormal = 2;
-        tiempoNormal = millis();
-      }
-    }
-
-
-    // FASE 2: AMARILLO
-    else if (faseNormal == 2) {
-
-      if (millis() - tiempoNormal >= 500) {
-
-        digitalWrite(amarillo, LOW);
-        digitalWrite(rojo, HIGH);
-
-        faseNormal = 0;
-        tiempoNormal = millis();
-      }
-    }
+    digitalWrite(red, LOW);
+    digitalWrite(yellow, LOW);
+    digitalWrite(green, LOW);
   }
 
 
+  // MODE 1: NORMAL WITHOUT DELAY
 
-  // MODO 2: AMARILLO INTERMITENTE SIN DELAY
+  else if (mode == 1) {
 
-  else if (modo == 2) {
 
-    if (millis() - tiempoIntermitente >= 500) {
+    // PHASE 0: RED
+    if (normalPhase == 0) {
 
-      estadoIntermitente = !estadoIntermitente;
+      // ONLY CHANGE COLOR AFTER 3000 MS HAVE PASSED
+      // SINCE THE PREVIOUS TIME REFERENCE
+      if (millis() - normalTime >= 3000) {
 
-      digitalWrite(amarillo, estadoIntermitente);
+        digitalWrite(red, LOW);
+        digitalWrite(green, HIGH);
 
-      tiempoIntermitente = millis();
+        normalPhase = 1;
+        normalTime = millis();
+      }
+    }
+
+
+    // PHASE 1: GREEN
+    else if (normalPhase == 1) {
+
+      if (millis() - normalTime >= 3000) {
+
+        digitalWrite(green, LOW);
+        digitalWrite(yellow, HIGH);
+
+        normalPhase = 2;
+        normalTime = millis();
+      }
+    }
+
+
+    // PHASE 2: YELLOW
+    else if (normalPhase == 2) {
+
+      if (millis() - normalTime >= 500) {
+
+        digitalWrite(yellow, LOW);
+        digitalWrite(red, HIGH);
+
+        normalPhase = 0;
+        normalTime = millis();
+      }
     }
   }
 
 
 
-  // MODO 3: MANUAL SIMPLE
+  // MODE 2: BLINKING YELLOW WITHOUT DELAY
 
-  else if (modo == 3) {
+  else if (mode == 2) {
 
-    mostrarMenuManualSimple();
+    if (millis() - blinkingTime >= 500) {
+
+      blinkingState = !blinkingState;
+
+      digitalWrite(yellow, blinkingState);
+
+      blinkingTime = millis();
+    }
+  }
 
 
-    while (modo == 3) {
-      
-      //LEER MENSAJE POR SERIAL MONITOR
+
+  // MODE 3: SIMPLE MANUAL
+
+  else if (mode == 3) {
+
+    showSimpleManualMenu();
+
+
+    while (mode == 3) {
+
+      // READ INPUT FROM SERIAL MONITOR
       if (Serial.available() > 0) {
 
-        char entradaLuz = Serial.read();
+        char lightInput = Serial.read();
 
-        //MIRAR VALORES INVALIDOS
-        if (entradaLuz < '0' || entradaLuz > '3') {
 
-          Serial.println("Valor invalido.");
+        // CHECK FOR INVALID VALUES
+        if (lightInput < '0' || lightInput > '3') {
+
+          Serial.println("Invalid value.");
         }
 
         else {
 
-          int luz = entradaLuz - '0';
+          int light = lightInput - '0';
 
 
-          // Rojo
-          if (luz == 1) {
+          // RED
+          if (light == 1) {
 
-            digitalWrite(rojo, HIGH);
-            digitalWrite(amarillo, LOW);
-            digitalWrite(verde, LOW);
+            digitalWrite(red, HIGH);
+            digitalWrite(yellow, LOW);
+            digitalWrite(green, LOW);
           }
 
 
-          // Amarillo
-          else if (luz == 2) {
+          // YELLOW
+          else if (light == 2) {
 
-            digitalWrite(rojo, LOW);
-            digitalWrite(amarillo, HIGH);
-            digitalWrite(verde, LOW);
+            digitalWrite(red, LOW);
+            digitalWrite(yellow, HIGH);
+            digitalWrite(green, LOW);
           }
 
 
-          // Verde
-          else if (luz == 3) {
+          // GREEN
+          else if (light == 3) {
 
-            digitalWrite(rojo, LOW);
-            digitalWrite(amarillo, LOW);
-            digitalWrite(verde, HIGH);
+            digitalWrite(red, LOW);
+            digitalWrite(yellow, LOW);
+            digitalWrite(green, HIGH);
           }
 
 
-          // Salir
-          else if (luz == 0) {
+          // EXIT
+          else if (light == 0) {
 
-            digitalWrite(rojo, LOW);
-            digitalWrite(amarillo, LOW);
-            digitalWrite(verde, LOW);
+            digitalWrite(red, LOW);
+            digitalWrite(yellow, LOW);
+            digitalWrite(green, LOW);
 
-            modo = 0;
+            mode = 0;
           }
         }
       }
     }
 
-    mostrarMenu();
+    showMenu();
   }
 
 
 
+  // MODE 4: ADVANCED MANUAL
 
-  // MODO 4: MANUAL COMPLEJO
+  else if (mode == 4) {
 
-
-  else if (modo == 4) {
-
-    mostrarMenuManualComplejo();
+    showAdvancedManualMenu();
 
 
-    //MODO ACTUAL DE CADA LED:
-    // 0 = APOAGADO
-    // 1 = FIJO
-    // 2 = PARPADEO
+    // CURRENT MODE OF EACH LED:
+    // 0 = OFF
+    // 1 = SOLID
+    // 2 = BLINKING
 
-    int modoRojo = 0;
-    int modoAmarillo = 0;
-    int modoVerde = 0;
-
-
-    //ESTADO ACTUAL DE CADA LED
-    bool estadoRojo = false;
-    bool estadoAmarillo = false;
-    bool estadoVerde = false;
+    int redMode = 0;
+    int yellowMode = 0;
+    int greenMode = 0;
 
 
-    //ULTIMO CAMBIO DE CADA LED
-    unsigned long tiempoRojo = 0;
-    unsigned long tiempoAmarillo = 0;
-    unsigned long tiempoVerde = 0;
+    // CURRENT STATE OF EACH LED
+    bool redState = false;
+    bool yellowState = false;
+    bool greenState = false;
 
 
-    while (modo == 4) {
+    // LAST CHANGE TIME OF EACH LED
+    unsigned long redTime = 0;
+    unsigned long yellowTime = 0;
+    unsigned long greenTime = 0;
 
-      //SI RECIBE INFORMACION POR EL SERIAL
+
+    while (mode == 4) {
+
+      // IF DATA IS RECEIVED THROUGH SERIAL
       if (Serial.available() > 0) {
 
-        char entradaCompleja = Serial.read();
+        char advancedInput = Serial.read();
 
-        //VALOR INVALIDO
-        if (entradaCompleja < '0' || entradaCompleja > '6') {
 
-          Serial.println("Valor invalido.");
+        // INVALID VALUE
+        if (advancedInput < '0' || advancedInput > '6') {
+
+          Serial.println("Invalid value.");
         }
 
-        //VALOR VALIDO
+
+        // VALID VALUE
         else {
 
-          int opcion = entradaCompleja - '0';
+          int option = advancedInput - '0';
 
-          // ROJO FIJO
-          if (opcion == 1) {
 
-            //SI ESTA ENCENDIDO APAGARLO Y VICEVERSA
-            if (modoRojo == 1) {
+          // SOLID RED
+          if (option == 1) {
 
-              modoRojo = 0;
+            // IF IT IS ALREADY SOLID, TURN IT OFF.
+            // OTHERWISE, SET IT TO SOLID.
+            if (redMode == 1) {
+
+              redMode = 0;
             }
 
             else {
 
-              modoRojo = 1;
+              redMode = 1;
             }
           }
 
-          // AMARILLO FIJO
-          else if (opcion == 2) {
-            
-            //SI ESTA ENCENDIDO APAGARLO Y VICEVERSA
-            if (modoAmarillo == 1) {
 
-              modoAmarillo = 0;
+          // SOLID YELLOW
+          else if (option == 2) {
+
+            // IF IT IS ALREADY SOLID, TURN IT OFF.
+            // OTHERWISE, SET IT TO SOLID.
+            if (yellowMode == 1) {
+
+              yellowMode = 0;
             }
 
             else {
 
-              modoAmarillo = 1;
+              yellowMode = 1;
             }
           }
 
-          // VERDE FIJO
-          else if (opcion == 3) {
 
-            //SI ESTA ENCENDIDO APAGARLO Y VICEVERSA
-            if (modoVerde == 1) {
+          // SOLID GREEN
+          else if (option == 3) {
 
-              modoVerde = 0;
+            // IF IT IS ALREADY SOLID, TURN IT OFF.
+            // OTHERWISE, SET IT TO SOLID.
+            if (greenMode == 1) {
+
+              greenMode = 0;
             }
 
             else {
 
-              modoVerde = 1;
+              greenMode = 1;
             }
           }
 
-          // PARPADEO ROJO
-          else if (opcion == 4) {
 
-            if (modoRojo == 2) {
+          // BLINKING RED
+          else if (option == 4) {
 
-              modoRojo = 0;
+            if (redMode == 2) {
+
+              redMode = 0;
             }
 
             else {
 
-              modoRojo = 2;
+              redMode = 2;
             }
           }
 
-          // PARPADEO AMARILLO
-          else if (opcion == 5) {
 
-            if (modoAmarillo == 2) {
+          // BLINKING YELLOW
+          else if (option == 5) {
 
-              modoAmarillo = 0;
+            if (yellowMode == 2) {
+
+              yellowMode = 0;
             }
 
             else {
 
-              modoAmarillo = 2;
+              yellowMode = 2;
             }
           }
 
-          // PARPADEO VERDE
-          else if (opcion == 6) {
 
-            if (modoVerde == 2) {
+          // BLINKING GREEN
+          else if (option == 6) {
 
-              modoVerde = 0;
+            if (greenMode == 2) {
+
+              greenMode = 0;
             }
 
             else {
 
-              modoVerde = 2;
+              greenMode = 2;
             }
           }
 
-          // SALIR
-          else if (opcion == 0) {
 
-            digitalWrite(rojo, LOW);
-            digitalWrite(amarillo, LOW);
-            digitalWrite(verde, LOW);
+          // EXIT
+          else if (option == 0) {
 
-            modo = 0;
+            digitalWrite(red, LOW);
+            digitalWrite(yellow, LOW);
+            digitalWrite(green, LOW);
+
+            mode = 0;
           }
         }
       }
 
-      //CONTROL ROJO
 
-      if (modoRojo == 0) {
+      // RED CONTROL
 
-        digitalWrite(rojo, LOW);
-        estadoRojo = false;
+      if (redMode == 0) {
+
+        digitalWrite(red, LOW);
+        redState = false;
       }
 
-      else if (modoRojo == 1) {
+      else if (redMode == 1) {
 
-        digitalWrite(rojo, HIGH);
-        estadoRojo = true;
+        digitalWrite(red, HIGH);
+        redState = true;
       }
 
-      else if (modoRojo == 2) {
+      else if (redMode == 2) {
 
-        parpadear(rojo, estadoRojo, tiempoRojo);
+        blink(red, redState, redTime);
       }
 
-      //CONTROL AMARILLO
 
-      if (modoAmarillo == 0) {
+      // YELLOW CONTROL
 
-        digitalWrite(amarillo, LOW);
-        estadoAmarillo = false;
+      if (yellowMode == 0) {
+
+        digitalWrite(yellow, LOW);
+        yellowState = false;
       }
 
-      else if (modoAmarillo == 1) {
+      else if (yellowMode == 1) {
 
-        digitalWrite(amarillo, HIGH);
-        estadoAmarillo = true;
+        digitalWrite(yellow, HIGH);
+        yellowState = true;
       }
 
-      else if (modoAmarillo == 2) {
+      else if (yellowMode == 2) {
 
-        parpadear(amarillo, estadoAmarillo, tiempoAmarillo);
+        blink(yellow, yellowState, yellowTime);
       }
 
-      //CONTROL VERDE
 
-      if (modoVerde == 0) {
+      // GREEN CONTROL
 
-        digitalWrite(verde, LOW);
-        estadoVerde = false;
+      if (greenMode == 0) {
+
+        digitalWrite(green, LOW);
+        greenState = false;
       }
 
-      else if (modoVerde == 1) {
+      else if (greenMode == 1) {
 
-        digitalWrite(verde, HIGH);
-        estadoVerde = true;
+        digitalWrite(green, HIGH);
+        greenState = true;
       }
 
-      else if (modoVerde == 2) {
+      else if (greenMode == 2) {
 
-        parpadear(verde, estadoVerde, tiempoVerde);
+        blink(green, greenState, greenTime);
       }
     }
 
-    mostrarMenu();
+
+    showMenu();
   }
 }

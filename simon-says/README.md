@@ -2,29 +2,38 @@
 
 A Simon Says memory game built with Arduino using LEDs, push buttons, and a buzzer.
 
-The game generates an increasingly long random sequence of colors. The player must reproduce the sequence correctly using the corresponding buttons.
+The game generates a random sequence of colors that becomes longer after each successful round. The player must reproduce it correctly using the corresponding buttons.
 
 ## Features
 
-- Four colored LEDs: yellow, green, red, and blue
-- Four push buttons for player input
+- Four LEDs and push buttons
 - Different buzzer tone for each color
-- Randomly generated sequences
-- Increasing difficulty after each successful round
-- Maximum time between button presses
-- Detection of incorrect or extra button presses
-- Visual and sound feedback when pressing a button
-- Defeat light and sound effect
+- Random and progressively longer sequences
+- Time limit between button presses
+- Detection of incorrect or extra inputs
+- Visual and sound feedback
 - High score tracking
-- Victory melody when a new high score is achieved
+- Victory and defeat effects
+
+## What I Learned
+
+This project helped me practice:
+
+- Working with arrays to store and compare sequences.
+- Generating random values with `random()`.
+- Using `tone()` and `noTone()` with a buzzer.
+- Working with musical notes and frequencies.
+- Reading and validating button inputs.
+- Managing time limits.
+- Organizing larger programs using functions.
 
 ## Components
 
 - Arduino Uno
 - 4 LEDs
 - 4 push buttons
-- 4 LED resistors
-- 1 buzzer
+- 4 resistors
+- Buzzer
 - Breadboard
 - Jumper wires
 
@@ -44,30 +53,18 @@ The game generates an increasingly long random sequence of colors. The player mu
 
 ## How It Works
 
-At the beginning of each round, the game adds a new random color to the sequence.
+Each round adds a new random color to the sequence.
 
-The complete sequence is then shown to the player using the LEDs and their corresponding buzzer tones.
+The Arduino shows the complete sequence using the LEDs and buzzer. The player must then reproduce it using the buttons.
 
-The player must reproduce the sequence using the four buttons. Each button press activates its corresponding LED and sound.
+The game ends if the player presses the wrong button, adds an extra input, or takes too long.
 
-If the player enters the complete sequence correctly, the game advances to the next round and adds another color.
+A new high score triggers a victory melody.
 
-The game ends if the player:
+## Demo Video
 
-- Presses an incorrect button
-- Presses an extra button
-- Takes too long between button presses
-
-After a defeat, the game displays the round reached and the current high score through the Serial Monitor.
-
-If a new high score is achieved, a victory melody is played.
-
-## Demo
-
-A demonstration video of the project is included in this folder.
+▶️ [Watch Simon Says on YouTube](https://youtube.com/shorts/HR4_xqF4TI4)
 
 ## Code
-
-The Arduino source code is available in:
 
 `Simon_Says.ino`

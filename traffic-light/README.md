@@ -15,7 +15,7 @@ The traffic light includes several operating modes:
   - Combine different LED states.
   - Switch between fixed and blinking states.
 
-## What I learned
+## What I Learned
 
 This project helped me practice:
 
@@ -36,3 +36,27 @@ This project helped me practice:
 - Resistors
 - Breadboard
 - Jumper wires
+
+## Demo Videos
+
+See the different operating modes of the project in action:
+
+### 🚦 Normal Mode
+
+The traffic light automatically follows the standard red, green, and yellow sequence.
+
+▶️ [Watch Normal Mode on YouTube](https://youtube.com/shorts/CWuzXLMFZGA)
+
+
+
+### 🎛️ Simple Manual Mode
+
+Manually select which LED is active.
+
+▶️ [Watch Simple Manual Mode on YouTube](https://youtube.com/shorts/1j9U4bRwd88)
+
+### ⚙️ Advanced Manual Mode
+
+Independently control each LED, including fixed and blinking states.
+
+▶️ [Watch Advanced Manual Mode on YouTube](https://youtube.com/shorts/W3grj5daBjs)
